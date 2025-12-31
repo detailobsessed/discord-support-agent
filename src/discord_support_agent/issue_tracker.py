@@ -282,7 +282,8 @@ def create_issue_tracker(
         if not linear_api_key or not linear_team_id:
             msg = "Linear API key and team ID are required for Linear issue tracking"
             raise ValueError(msg)
-        return LinearIssueTracker(api_key=linear_api_key, team_id=linear_team_id)
+        msg = "Linear issue tracking is not yet implemented"
+        raise NotImplementedError(msg)
 
     msg = f"Unknown tracker type: {tracker_type}"
     raise ValueError(msg)
