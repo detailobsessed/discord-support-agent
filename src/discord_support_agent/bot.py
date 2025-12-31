@@ -6,6 +6,12 @@ import discord
 
 from discord_support_agent.classifier import ClassificationResult, MessageClassifier
 from discord_support_agent.config import Settings
+from discord_support_agent.issue_tracker import (
+    IssueTracker,
+    IssueTrackerType,
+    MessageContext,
+    create_issue_tracker,
+)
 from discord_support_agent.notifier import send_notification
 
 _MAX_NOTIFICATION_LENGTH = 200
@@ -26,6 +32,13 @@ class SupportMonitorBot(discord.Client):
 
         self.settings = settings
         self.classifier = MessageClassifier(settings)
+        self.issue_tracker: IssueTracker = create_issue_tracker(
+            IssueTrackerType(settings.issue_tracker),
+            github_token=settings.github_token,
+            github_repo=settings.github_repo,
+            linear_api_key=settings.linear_api_key,
+            linear_team_id=settings.linear_team_id,
+        )
         self._processed_message_ids: set[int] = set()
         self._max_processed_cache = 10000
 
@@ -131,3 +144,43 @@ class SupportMonitorBot(discord.Client):
             message=body,
             subtitle=subtitle,
         )
+
+        # Create issue if tracking is enabled
+        await self._create_issue(message, result)
+
+    async def _create_issue(
+        self,
+        message: discord.Message,
+        result: ClassificationResult,
+    ) -> None:
+        """Create an issue for a message that requires attention."""
+        if self.issue_tracker.tracker_type == IssueTrackerType.NONE:
+            return
+
+        channel_name = getattr(message.channel, "name", "unknown")
+        guild_name = message.guild.name if message.guild else "DM"
+        guild_id = message.guild.id if message.guild else 0
+
+        context = MessageContext(
+            message_id=message.id,
+            message_content=message.content,
+            author_name=message.author.display_name,
+            author_id=message.author.id,
+            channel_name=channel_name,
+            channel_id=message.channel.id,
+            guild_name=guild_name,
+            guild_id=guild_id,
+            message_url=message.jump_url,
+            classification=result,
+        )
+
+        try:
+            issue_info = await self.issue_tracker.create_issue(context)
+            logger.info(
+                "Created %s issue %s: %s",
+                issue_info.tracker.value,
+                issue_info.issue_id,
+                issue_info.issue_url,
+            )
+        except Exception:
+            logger.exception("Failed to create issue for message %d", message.id)
