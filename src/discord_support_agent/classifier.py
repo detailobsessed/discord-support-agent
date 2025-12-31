@@ -1,14 +1,17 @@
 """Message classification using Pydantic AI with Ollama."""
 
 import logging
+from dataclasses import dataclass
 from enum import Enum
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.ollama import OllamaProvider
+from pydantic_ai.usage import RunUsage
 
 from discord_support_agent.config import Settings
+from discord_support_agent.usage import UsageTracker
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +41,14 @@ class ClassificationResult(BaseModel):
     )
 
 
+@dataclass
+class ClassificationOutput:
+    """Classification result with usage information."""
+
+    result: ClassificationResult
+    usage: RunUsage
+
+
 SYSTEM_PROMPT = """You are a Discord message classifier for a community support server.
 
 Your job is to analyze messages and determine if they require attention from support staff.
@@ -63,6 +74,7 @@ class MessageClassifier:
         """Initialize the classifier with settings."""
         self.settings = settings
         self._agent: Agent[None, ClassificationResult] | None = None
+        self.usage_tracker = UsageTracker(model_name=settings.ollama_model)
 
     @property
     def agent(self) -> Agent[None, ClassificationResult]:
@@ -125,7 +137,7 @@ class MessageClassifier:
         message_content: str,
         author_name: str,
         channel_name: str,
-    ) -> ClassificationResult:
+    ) -> ClassificationOutput:
         """Classify a Discord message.
 
         Args:
@@ -134,7 +146,7 @@ class MessageClassifier:
             channel_name: The name of the channel where the message was posted.
 
         Returns:
-            Classification result with category, confidence, and attention flag.
+            Classification output with result and usage information.
 
         Raises:
             Exception: If classification fails after all retries.
@@ -153,10 +165,14 @@ Determine the category and whether it requires support staff attention."""
             logger.exception("Failed to classify message from %s", author_name)
             raise
         else:
+            usage = result.usage()
+            await self.usage_tracker.record(usage)
+
             logger.debug(
-                "Classified message: category=%s, confidence=%.2f, attention=%s",
+                "Classified message: category=%s, confidence=%.2f, attention=%s, tokens=%d",
                 result.output.category,
                 result.output.confidence,
                 result.output.requires_attention,
+                usage.total_tokens,
             )
-            return result.output
+            return ClassificationOutput(result=result.output, usage=usage)
