@@ -1,9 +1,10 @@
 name: release
 
 "on":
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   release:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: blacksmith-4vcpu-ubuntu-2404
     concurrency: release
 
