@@ -6,6 +6,7 @@ import discord
 
 from discord_support_agent.classifier import (
     ClassificationResult,
+    ClassifierDeps,
     MessageClassifier,
 )
 from discord_support_agent.config import Settings
@@ -90,6 +91,7 @@ class SupportMonitorBot(discord.Client):
         try:
             channel_name = getattr(message.channel, "name", "unknown")
             author_name = message.author.display_name
+            guild_name = message.guild.name if message.guild else "DM"
 
             logger.debug(
                 "Classifying message from %s in #%s: %s",
@@ -98,10 +100,19 @@ class SupportMonitorBot(discord.Client):
                 message.content[:100],
             )
 
-            output = await self.classifier.classify(
-                message_content=message.content,
+            # Build classifier dependencies with available context
+            deps = ClassifierDeps(
+                author_id=message.author.id,
                 author_name=author_name,
                 channel_name=channel_name,
+                guild_name=guild_name,
+                message_timestamp=message.created_at,
+                author_joined_at=getattr(message.author, "joined_at", None),
+            )
+
+            output = await self.classifier.classify(
+                message_content=message.content,
+                deps=deps,
             )
 
             logger.debug(
