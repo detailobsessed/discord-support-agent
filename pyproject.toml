@@ -9,7 +9,7 @@ authors = [{name = "Ismar Iljazovic", email = "ismart@gmail.com"}]
 license = "ISC"
 license-files = ["LICENSE"]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 keywords = []
 version = "0.0.0"
 classifiers = [
@@ -18,15 +18,16 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
     "Topic :: Documentation",
     "Topic :: Software Development",
     "Topic :: Utilities",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "discord-py>=2.6",
+    "pydantic-ai>=1.39.0",
+]
 
 [project.urls]
 Homepage = "https://detailobsessed.github.io/discord-support-agent"
