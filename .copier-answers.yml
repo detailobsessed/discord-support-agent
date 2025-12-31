@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier.
+_commit: 2.14.0
+_src_path: gh:detailobsessed/copier-uv-bleeding
+author_email: ismart@gmail.com
+author_fullname: Ismar Iljazovic
+author_username: detailobsessed
+copyright_license: ISC
+project_description: AI agent that monitors Discord servers and notifies about support
+    requests
+project_name: discord-support-agent
+project_type: app
+publish_to_pypi: false
+
