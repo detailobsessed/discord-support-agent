@@ -1,5 +1,7 @@
 """Configuration for the Discord Support Agent."""
 
+from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -38,6 +40,28 @@ class Settings(BaseSettings):
     lookback_minutes: int = Field(
         default=5,
         description="How far back to look for messages on each check",
+    )
+
+    # Issue tracking
+    issue_tracker: Literal["none", "github", "linear"] = Field(
+        default="none",
+        description="Issue tracker to use: none, github, or linear",
+    )
+    github_token: str = Field(
+        default="",
+        description="GitHub personal access token for issue creation",
+    )
+    github_repo: str = Field(
+        default="",
+        description="GitHub repository in 'owner/repo' format",
+    )
+    linear_api_key: str = Field(
+        default="",
+        description="Linear API key for issue creation",
+    )
+    linear_team_id: str = Field(
+        default="",
+        description="Linear team ID for issue creation",
     )
 
 

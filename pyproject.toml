@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
     "discord-py>=2.6",
     "pydantic-ai>=1.39.0",
+    "pygithub>=2.8.1",
 ]
 
 [project.urls]
