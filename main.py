@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from discord_support_agent.bot import SupportMonitorBot
-from discord_support_agent.config import get_settings
+from discord_support_agent.config import Settings, get_settings
 from discord_support_agent.instrumentation import configure_instrumentation
 
 
@@ -30,9 +30,8 @@ def setup_logging() -> None:
     logging.getLogger("discord.http").setLevel(logging.WARNING)
 
 
-async def run_bot() -> None:
+async def run_bot(settings: Settings) -> None:
     """Run the Discord bot."""
-    settings = get_settings()
     bot = SupportMonitorBot(settings)
 
     async with bot:
@@ -56,7 +55,7 @@ def main() -> None:
     logger.info("Starting Discord Support Agent...")
 
     try:
-        asyncio.run(run_bot())
+        asyncio.run(run_bot(settings))
     except KeyboardInterrupt:
         logger.info("Shutting down...")
 

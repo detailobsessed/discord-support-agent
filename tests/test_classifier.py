@@ -1,11 +1,14 @@
 """Tests for the message classifier using Pydantic AI TestModel."""
 
+from datetime import UTC, datetime
+
 import pytest
 from pydantic_ai import models
 from pydantic_ai.models.test import TestModel
 
 from discord_support_agent.classifier import (
     ClassificationResult,
+    ClassifierDeps,
     MessageCategory,
     MessageClassifier,
 )
@@ -33,6 +36,20 @@ def classifier(settings: Settings) -> MessageClassifier:
     return MessageClassifier(settings)
 
 
+def make_deps(
+    author_name: str = "TestUser",
+    channel_name: str = "support",
+) -> ClassifierDeps:
+    """Create test classifier dependencies."""
+    return ClassifierDeps(
+        author_id=12345,
+        author_name=author_name,
+        channel_name=channel_name,
+        guild_name="TestGuild",
+        message_timestamp=datetime.now(UTC),
+    )
+
+
 class TestMessageClassifier:
     """Tests for MessageClassifier."""
 
@@ -50,12 +67,11 @@ class TestMessageClassifier:
         }
 
         with classifier.agent.override(
-            model=TestModel(custom_output_args=custom_args),
+            model=TestModel(custom_output_args=custom_args, call_tools=[]),
         ):
             result = await classifier.classify(
                 message_content="How do I reset my password?",
-                author_name="TestUser",
-                channel_name="support",
+                deps=make_deps(author_name="TestUser", channel_name="support"),
             )
 
         assert result.result.category == MessageCategory.SUPPORT_REQUEST
@@ -73,12 +89,11 @@ class TestMessageClassifier:
         }
 
         with classifier.agent.override(
-            model=TestModel(custom_output_args=custom_args),
+            model=TestModel(custom_output_args=custom_args, call_tools=[]),
         ):
             result = await classifier.classify(
                 message_content="The app crashes when I click submit",
-                author_name="BugReporter",
-                channel_name="bugs",
+                deps=make_deps(author_name="BugReporter", channel_name="bugs"),
             )
 
         assert result.result.category == MessageCategory.BUG_REPORT
@@ -94,12 +109,11 @@ class TestMessageClassifier:
         }
 
         with classifier.agent.override(
-            model=TestModel(custom_output_args=custom_args),
+            model=TestModel(custom_output_args=custom_args, call_tools=[]),
         ):
             result = await classifier.classify(
                 message_content="This is so frustrating, nothing works!",
-                author_name="FrustratedUser",
-                channel_name="general",
+                deps=make_deps(author_name="FrustratedUser", channel_name="general"),
             )
 
         assert result.result.category == MessageCategory.COMPLAINT
@@ -118,12 +132,11 @@ class TestMessageClassifier:
         }
 
         with classifier.agent.override(
-            model=TestModel(custom_output_args=custom_args),
+            model=TestModel(custom_output_args=custom_args, call_tools=[]),
         ):
             result = await classifier.classify(
                 message_content="Hey everyone, happy Friday!",
-                author_name="HappyUser",
-                channel_name="general",
+                deps=make_deps(author_name="HappyUser", channel_name="general"),
             )
 
         assert result.result.category == MessageCategory.GENERAL_CHAT
@@ -142,12 +155,11 @@ class TestMessageClassifier:
         }
 
         with classifier.agent.override(
-            model=TestModel(custom_output_args=custom_args),
+            model=TestModel(custom_output_args=custom_args, call_tools=[]),
         ):
             result = await classifier.classify(
                 message_content="🎉🎊🎈",
-                author_name="EmojiUser",
-                channel_name="random",
+                deps=make_deps(author_name="EmojiUser", channel_name="random"),
             )
 
         assert result.result.category == MessageCategory.OTHER

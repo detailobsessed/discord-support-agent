@@ -42,12 +42,17 @@ uv run python main.py
 
 Environment variables (set in `.env`):
 
-| Variable             | Required | Default                      | Description                          |
-| -------------------- | -------- | ---------------------------- | ------------------------------------ |
-| `DISCORD_TOKEN`      | Yes      | -                            | Discord bot token                    |
-| `DISCORD_GUILD_IDS`  | No       | (all)                        | Comma-separated guild IDs to monitor |
-| `OLLAMA_BASE_URL`    | No       | `http://localhost:11434/v1`  | Ollama API URL                       |
-| `OLLAMA_MODEL`       | No       | `qwen3:30b`                  | Model for classification             |
+| Variable                 | Required | Default                     | Description                              |
+| ------------------------ | -------- | --------------------------- | ---------------------------------------- |
+| `DISCORD_TOKEN`          | Yes      | -                           | Discord bot token                        |
+| `DISCORD_GUILD_IDS`      | No       | (all)                       | Comma-separated guild IDs to monitor     |
+| `OLLAMA_BASE_URL`        | No       | `http://localhost:11434/v1` | Ollama API URL                           |
+| `OLLAMA_MODEL`           | No       | `qwen3:30b`                 | Model for classification                 |
+| `ISSUE_TRACKER`          | No       | `none`                      | Issue tracker: `none`, `github`, `linear`|
+| `GITHUB_TOKEN`           | No       | -                           | GitHub PAT for issue creation            |
+| `GITHUB_REPO`            | No       | -                           | GitHub repo in `owner/repo` format       |
+| `OTEL_ENABLED`           | No       | `false`                     | Enable OpenTelemetry instrumentation     |
+| `OTEL_EXPORTER_ENDPOINT` | No       | `http://localhost:4318`     | OTLP exporter endpoint                   |
 
 ## How It Works
 
@@ -57,4 +62,18 @@ Environment variables (set in `.env`):
    - **Complaint** - User expressing frustration
    - **Bug Report** - User reporting a problem
    - **General Chat** - Normal conversation (ignored)
-3. Messages requiring attention trigger a macOS notification
+3. The classifier can use tools to get additional context:
+   - **User context** - Is the user new? What's their activity level?
+   - **Channel context** - Recent messages for conversation flow
+4. Messages requiring attention trigger a macOS notification
+5. Optionally, issues are created in GitHub or Linear
+
+## Features
+
+- **Local LLM inference** via Ollama (no API costs)
+- **Smart classification** with confidence scores and automatic retries
+- **Agent tools** for user/channel context during classification
+- **Usage tracking** for token consumption monitoring
+- **OpenTelemetry instrumentation** via Logfire (works with otel-tui, Jaeger, etc.)
+- **Issue tracking** integration (GitHub Issues, Linear planned)
+- **Pydantic Evals** for classifier quality testing
