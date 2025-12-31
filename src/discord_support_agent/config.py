@@ -64,6 +64,20 @@ class Settings(BaseSettings):
         description="Linear team ID for issue creation",
     )
 
+    # OpenTelemetry / Instrumentation
+    otel_enabled: bool = Field(
+        default=False,
+        description="Enable OpenTelemetry instrumentation",
+    )
+    otel_exporter_endpoint: str = Field(
+        default="http://localhost:4318",
+        description="OTLP exporter endpoint (e.g., otel-tui, Jaeger)",
+    )
+    otel_instrument_httpx: bool = Field(
+        default=False,
+        description="Also instrument HTTPX for raw HTTP request visibility",
+    )
+
 
 def get_settings() -> Settings:
     """Get application settings."""

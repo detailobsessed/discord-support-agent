@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
     "discord-py>=2.6",
+    "logfire>=3",
     "pydantic-ai>=1.39.0",
     "pygithub>=2.8.1",
 ]
