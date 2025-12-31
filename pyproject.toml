@@ -110,6 +110,7 @@ setup = "uv sync --all-extras --dev"
 releases = "gh release list --limit 10"
 tags = "sh -c 'git fetch --tags && git tag --sort=-version:refname'"
 runs = "gh run list --limit 10"
+prs = "gh pr list"
 watch = "gh run watch"
 
 [tool.semantic_release]

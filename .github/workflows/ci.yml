@@ -30,9 +30,9 @@ jobs:
     strategy:
       matrix:
         os:
-        - ubuntu-latest
+        - blacksmith-4vcpu-ubuntu-2404
         - macos-latest
-        - windows-latest
+        - blacksmith-4vcpu-windows-2025
         python-version:
         - "3.14"
 
@@ -40,7 +40,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
         fetch-tags: true
@@ -77,8 +77,8 @@ jobs:
       run: uv run poe lint
 
     - name: Store objects inventory for tests
-      uses: actions/upload-artifact@v4
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14' }}
+      uses: actions/upload-artifact@v6
+      if: ${{ matrix.os == 'blacksmith-4vcpu-ubuntu-2404' && matrix.python-version == '3.14' }}
       with:
         name: objects.inv
         path: site/objects.inv
@@ -90,9 +90,9 @@ jobs:
     strategy:
       matrix:
         os:
-        - ubuntu-latest
+        - blacksmith-4vcpu-ubuntu-2404
         - macos-latest
-        - windows-latest
+        - blacksmith-4vcpu-windows-2025
         python-version:
         - "3.14"
         resolution:
@@ -101,14 +101,14 @@ jobs:
         exclude:
         - os: macos-latest
           resolution: lowest-direct
-        - os: windows-latest
+        - os: blacksmith-4vcpu-windows-2025
           resolution: lowest-direct
     runs-on: ${{ matrix.os }}
     continue-on-error: true
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
         fetch-tags: true
@@ -132,7 +132,7 @@ jobs:
       run: uv run poe setup
 
     - name: Download objects inventory
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: objects.inv
         path: site/
