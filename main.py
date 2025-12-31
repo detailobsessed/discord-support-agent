@@ -2,11 +2,13 @@
 
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 
 from discord_support_agent.bot import SupportMonitorBot
 from discord_support_agent.config import get_settings
+from discord_support_agent.instrumentation import configure_instrumentation
 
 
 def setup_logging() -> None:
@@ -41,6 +43,15 @@ def main() -> None:
     """Run the application."""
     setup_logging()
     logger = logging.getLogger(__name__)
+
+    # Load settings and configure instrumentation before anything else
+    settings = get_settings()
+
+    # Set OTEL endpoint from settings (must be set before logfire.configure)
+    if settings.otel_enabled:
+        os.environ.setdefault("OTEL_EXPORTER_OTLP_ENDPOINT", settings.otel_exporter_endpoint)
+
+    configure_instrumentation(settings)
 
     logger.info("Starting Discord Support Agent...")
 
