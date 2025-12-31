@@ -17,6 +17,12 @@
 /site/
 uv.lock
 
+# environment
+.env
+
+# logs
+logs/
+
 # cache
 .cache/
 .pytest_cache/
