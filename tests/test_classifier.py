@@ -58,9 +58,10 @@ class TestMessageClassifier:
                 channel_name="support",
             )
 
-        assert result.category == MessageCategory.SUPPORT_REQUEST
-        assert result.confidence == 0.95
-        assert result.requires_attention is True
+        assert result.result.category == MessageCategory.SUPPORT_REQUEST
+        assert result.result.confidence == 0.95
+        assert result.result.requires_attention is True
+        assert result.usage.total_tokens >= 0
 
     async def test_classify_bug_report(self, classifier: MessageClassifier) -> None:
         """Test classification of a bug report."""
@@ -80,8 +81,8 @@ class TestMessageClassifier:
                 channel_name="bugs",
             )
 
-        assert result.category == MessageCategory.BUG_REPORT
-        assert result.requires_attention is True
+        assert result.result.category == MessageCategory.BUG_REPORT
+        assert result.result.requires_attention is True
 
     async def test_classify_complaint(self, classifier: MessageClassifier) -> None:
         """Test classification of a complaint."""
@@ -101,8 +102,8 @@ class TestMessageClassifier:
                 channel_name="general",
             )
 
-        assert result.category == MessageCategory.COMPLAINT
-        assert result.requires_attention is True
+        assert result.result.category == MessageCategory.COMPLAINT
+        assert result.result.requires_attention is True
 
     async def test_classify_general_chat_no_attention(
         self,
@@ -125,8 +126,8 @@ class TestMessageClassifier:
                 channel_name="general",
             )
 
-        assert result.category == MessageCategory.GENERAL_CHAT
-        assert result.requires_attention is False
+        assert result.result.category == MessageCategory.GENERAL_CHAT
+        assert result.result.requires_attention is False
 
     async def test_classify_other_category(
         self,
@@ -149,8 +150,8 @@ class TestMessageClassifier:
                 channel_name="random",
             )
 
-        assert result.category == MessageCategory.OTHER
-        assert result.requires_attention is False
+        assert result.result.category == MessageCategory.OTHER
+        assert result.result.requires_attention is False
 
 
 class TestClassificationResult:

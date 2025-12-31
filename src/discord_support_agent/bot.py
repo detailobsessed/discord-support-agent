@@ -4,7 +4,10 @@ import logging
 
 import discord
 
-from discord_support_agent.classifier import ClassificationResult, MessageClassifier
+from discord_support_agent.classifier import (
+    ClassificationResult,
+    MessageClassifier,
+)
 from discord_support_agent.config import Settings
 from discord_support_agent.issue_tracker import (
     IssueTracker,
@@ -95,21 +98,22 @@ class SupportMonitorBot(discord.Client):
                 message.content[:100],
             )
 
-            result = await self.classifier.classify(
+            output = await self.classifier.classify(
                 message_content=message.content,
                 author_name=author_name,
                 channel_name=channel_name,
             )
 
             logger.debug(
-                "Classification: %s (confidence: %.2f, attention: %s)",
-                result.category.value,
-                result.confidence,
-                result.requires_attention,
+                "Classification: %s (confidence: %.2f, attention: %s, tokens: %d)",
+                output.result.category.value,
+                output.result.confidence,
+                output.result.requires_attention,
+                output.usage.total_tokens,
             )
 
-            if result.requires_attention:
-                await self._notify(message, result)
+            if output.result.requires_attention:
+                await self._notify(message, output.result)
 
         except Exception:
             logger.exception("Error processing message %d", message.id)
