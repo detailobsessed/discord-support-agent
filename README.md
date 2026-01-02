@@ -1,6 +1,9 @@
 # discord-support-agent
 
 [![ci](https://github.com/detailobsessed/discord-support-agent/workflows/ci/badge.svg)](https://github.com/detailobsessed/discord-support-agent/actions?query=workflow%3Aci)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
+[![License: ISC](https://img.shields.io/badge/license-ISC-green.svg)](https://opensource.org/licenses/ISC)
+[![Pydantic AI](https://img.shields.io/badge/pydantic--ai-powered-orange.svg)](https://ai.pydantic.dev/)
 
 AI agent that monitors Discord servers and notifies about support requests.
 
