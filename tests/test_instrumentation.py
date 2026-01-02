@@ -11,7 +11,7 @@ class TestConfigureInstrumentation:
 
     def test_disabled_by_default(self) -> None:
         """Instrumentation should be disabled by default."""
-        settings = Settings(discord_token="test-token")  # noqa: S106
+        settings = Settings(discord_token="test-token")
 
         with patch("discord_support_agent.instrumentation.logfire") as mock_logfire:
             configure_instrumentation(settings)
@@ -21,7 +21,7 @@ class TestConfigureInstrumentation:
 
     def test_enabled_configures_logfire(self) -> None:
         """When enabled, should configure logfire with send_to_logfire=False."""
-        settings = Settings(discord_token="test-token", otel_enabled=True)  # noqa: S106
+        settings = Settings(discord_token="test-token", otel_enabled=True)
 
         with patch("discord_support_agent.instrumentation.logfire") as mock_logfire:
             configure_instrumentation(settings)
@@ -34,7 +34,7 @@ class TestConfigureInstrumentation:
 
     def test_httpx_instrumentation_disabled_by_default(self) -> None:
         """HTTPX instrumentation should be disabled by default."""
-        settings = Settings(discord_token="test-token", otel_enabled=True)  # noqa: S106
+        settings = Settings(discord_token="test-token", otel_enabled=True)
 
         with patch("discord_support_agent.instrumentation.logfire") as mock_logfire:
             configure_instrumentation(settings)
@@ -44,7 +44,7 @@ class TestConfigureInstrumentation:
     def test_httpx_instrumentation_when_enabled(self) -> None:
         """HTTPX instrumentation should be enabled when configured."""
         settings = Settings(
-            discord_token="test-token",  # noqa: S106
+            discord_token="test-token",
             otel_enabled=True,
             otel_instrument_httpx=True,
         )
@@ -57,7 +57,7 @@ class TestConfigureInstrumentation:
     def test_custom_endpoint_in_settings(self) -> None:
         """Custom OTEL endpoint should be stored in settings."""
         settings = Settings(
-            discord_token="test-token",  # noqa: S106
+            discord_token="test-token",
             otel_enabled=True,
             otel_exporter_endpoint="http://custom:4317",
         )

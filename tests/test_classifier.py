@@ -24,7 +24,7 @@ pytestmark = pytest.mark.anyio
 def settings() -> Settings:
     """Create test settings."""
     return Settings(
-        discord_token="test-token",  # noqa: S106
+        discord_token="test-token",
         ollama_base_url="http://localhost:11434/v1",
         ollama_model="test-model",
     )

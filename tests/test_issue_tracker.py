@@ -102,12 +102,12 @@ class TestGitHubIssueTracker:
 
     def test_tracker_type(self) -> None:
         """Test that GitHubIssueTracker returns correct type."""
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         assert tracker.tracker_type == IssueTrackerType.GITHUB
 
     def test_build_title(self, sample_context: MessageContext) -> None:
         """Test issue title generation."""
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         title = tracker._build_title(sample_context)
 
         assert "[Support Request]" in title
@@ -133,7 +133,7 @@ class TestGitHubIssueTracker:
             ),
         )
 
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         title = tracker._build_title(context)
 
         # Title should be truncated with ellipsis
@@ -142,7 +142,7 @@ class TestGitHubIssueTracker:
 
     def test_build_body(self, sample_context: MessageContext) -> None:
         """Test issue body generation."""
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         body = tracker._build_body(sample_context)
 
         assert "TestUser" in body
@@ -155,7 +155,7 @@ class TestGitHubIssueTracker:
 
     def test_get_labels_support_request(self, sample_context: MessageContext) -> None:
         """Test label generation for support requests."""
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         labels = tracker._get_labels(sample_context)
 
         assert "support" in labels
@@ -181,7 +181,7 @@ class TestGitHubIssueTracker:
             ),
         )
 
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         labels = tracker._get_labels(context)
 
         assert "bug" in labels
@@ -207,7 +207,7 @@ class TestGitHubIssueTracker:
             ),
         )
 
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         labels = tracker._get_labels(context)
 
         assert "complaint" in labels
@@ -233,7 +233,7 @@ class TestGitHubIssueTracker:
             ),
         )
 
-        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")  # noqa: S106
+        tracker = GitHubIssueTracker(token="test-token", repo="owner/repo")
         labels = tracker._get_labels(context)
 
         assert labels == []
@@ -251,7 +251,7 @@ class TestCreateIssueTracker:
         """Test creating a GitHub tracker."""
         tracker = create_issue_tracker(
             IssueTrackerType.GITHUB,
-            github_token="test-token",  # noqa: S106
+            github_token="test-token",
             github_repo="owner/repo",
         )
         assert isinstance(tracker, GitHubIssueTracker)
@@ -270,7 +270,7 @@ class TestCreateIssueTracker:
         with pytest.raises(ValueError, match="GitHub token and repo are required"):
             create_issue_tracker(
                 IssueTrackerType.GITHUB,
-                github_token="test-token",  # noqa: S106
+                github_token="test-token",
                 github_repo="",
             )
 
