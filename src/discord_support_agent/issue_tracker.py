@@ -1,6 +1,7 @@
 """Issue tracking integrations for creating tickets from support requests."""
 
 import asyncio
+import itertools
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -93,6 +94,9 @@ class IssueTracker(ABC):
 - **Category:** {context.classification.category.value}
 - **Confidence:** {context.classification.confidence:.0%}
 - **Reason:** {context.classification.reason}
+
+---
+<!-- discord_message_id:{context.message_id} -->
 """
 
     def _get_labels(self, context: MessageContext) -> list[str]:
@@ -169,10 +173,55 @@ class GitHubIssueTracker(IssueTracker):
         return self._repo_obj
 
     async def create_issue(self, context: MessageContext) -> IssueInfo:
-        """Create a GitHub issue."""
-        # PyGithub is sync, run in executor
+        """Create a GitHub issue if one doesn't already exist for this message."""
         loop = asyncio.get_event_loop()
+
+        # Check for existing issue with same content first
+        existing = await loop.run_in_executor(
+            None,
+            self._find_existing_issue,
+            context.message_content,
+        )
+        if existing:
+            logger.info(
+                "Duplicate issue found for content: #%s",
+                existing.issue_id,
+            )
+            return existing
+
+        # PyGithub is sync, run in executor
         return await loop.run_in_executor(None, self._create_issue_sync, context)
+
+    _DEDUP_SEARCH_LIMIT = 50
+
+    def _find_existing_issue(self, message_content: str) -> IssueInfo | None:
+        """Search for an existing issue with the same message content."""
+        # Use repo.get_issues() instead of search_issues() to avoid indexing delay
+        # GitHub's search index can take minutes to update, causing duplicates
+        #
+        # Match the exact quoted format from _build_body to avoid false positives
+        # e.g., "help" should NOT match "help with password reset"
+        quoted_content = f"> {message_content}"
+        try:
+            repo = self._get_repo()
+            for issue in itertools.islice(
+                repo.get_issues(state="open", sort="created", direction="desc"),
+                self._DEDUP_SEARCH_LIMIT,
+            ):
+                # Check for exact quoted content match
+                if issue.body and quoted_content in issue.body:
+                    return IssueInfo(
+                        tracker=IssueTrackerType.GITHUB,
+                        issue_id=str(issue.number),
+                        issue_url=issue.html_url,
+                        title=issue.title,
+                    )
+        except Exception:  # noqa: BLE001
+            logger.warning(
+                "Failed to search for existing issues, proceeding with creation",
+                exc_info=True,
+            )
+        return None
 
     def _create_issue_sync(self, context: MessageContext) -> IssueInfo:
         """Synchronous issue creation."""

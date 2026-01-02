@@ -3,8 +3,9 @@
 import asyncio
 import logging
 import os
-import sys
 from pathlib import Path
+
+from rich.logging import RichHandler
 
 from discord_support_agent.bot import SupportMonitorBot
 from discord_support_agent.config import Settings, get_settings
@@ -18,10 +19,10 @@ def setup_logging() -> None:
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        format="%(name)s | %(message)s",
+        datefmt="[%X]",
         handlers=[
-            logging.StreamHandler(sys.stdout),
+            RichHandler(rich_tracebacks=True, show_path=False),
             logging.FileHandler(log_dir / "agent.log"),
         ],
     )

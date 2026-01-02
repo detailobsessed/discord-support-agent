@@ -201,8 +201,7 @@ class SupportMonitorBot(discord.Client):
         try:
             issue_info = await self.issue_tracker.create_issue(context)
             logger.info(
-                "Created %s issue %s: %s",
-                issue_info.tracker.value,
+                "Issue %s: %s",
                 issue_info.issue_id,
                 issue_info.issue_url,
             )
