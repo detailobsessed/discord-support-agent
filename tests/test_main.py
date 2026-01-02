@@ -36,6 +36,14 @@ class TestIssueCategoriesConfig:
         )
         assert settings.issue_categories == []
 
+    def test_comma_separated_issue_categories(self) -> None:
+        """Test comma-separated string is parsed into list."""
+        settings = Settings(
+            discord_token="test",
+            issue_categories="support_request, bug_report",  # type: ignore[arg-type]
+        )
+        assert settings.issue_categories == ["support_request", "bug_report"]
+
     def test_invalid_category_logs_warning(self, caplog: pytest.LogCaptureFixture) -> None:
         """Test that invalid category names log a warning."""
         with caplog.at_level("WARNING"):
