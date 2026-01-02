@@ -1,10 +1,10 @@
 """Configuration for the Discord Support Agent."""
 
 import logging
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -69,10 +69,18 @@ class Settings(BaseSettings):
         default="",
         description="Linear team ID for issue creation",
     )
-    issue_categories: list[str] = Field(
+    issue_categories: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["support_request", "complaint", "bug_report"],
         description="Message categories that create issues (empty = all that require attention)",
     )
+
+    @field_validator("issue_categories", mode="before")
+    @classmethod
+    def parse_issue_categories(cls, v: str | list[str]) -> list[str]:
+        """Parse comma-separated string from env var into list."""
+        if isinstance(v, str):
+            return [x.strip() for x in v.split(",") if x.strip()]
+        return v
 
     @field_validator("issue_categories")
     @classmethod
