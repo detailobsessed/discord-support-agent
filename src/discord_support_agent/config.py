@@ -1,9 +1,15 @@
 """Configuration for the Discord Support Agent."""
 
+import logging
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
+
+# Must match MessageCategory enum values in classifier.py (circular import prevents deriving)
+VALID_CATEGORIES = {"support_request", "complaint", "bug_report", "general_chat", "other"}
 
 
 class Settings(BaseSettings):
@@ -63,6 +69,23 @@ class Settings(BaseSettings):
         default="",
         description="Linear team ID for issue creation",
     )
+    issue_categories: list[str] = Field(
+        default_factory=lambda: ["support_request", "complaint", "bug_report"],
+        description="Message categories that create issues (empty = all that require attention)",
+    )
+
+    @field_validator("issue_categories")
+    @classmethod
+    def warn_invalid_categories(cls, v: list[str]) -> list[str]:
+        """Warn about invalid category names that won't match any messages."""
+        invalid = set(v) - VALID_CATEGORIES
+        if invalid:
+            logger.warning(
+                "Unknown issue categories (won't match any messages): %s. Valid categories: %s",
+                sorted(invalid),
+                sorted(VALID_CATEGORIES),
+            )
+        return v
 
     # OpenTelemetry / Instrumentation
     otel_enabled: bool = Field(

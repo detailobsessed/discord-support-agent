@@ -125,6 +125,7 @@ class SupportMonitorBot(discord.Client):
 
             if output.result.requires_attention:
                 await self._notify(message, output.result)
+                await self._maybe_create_issue(message, output.result)
 
         except Exception:
             logger.exception("Error processing message %d", message.id)
@@ -160,16 +161,24 @@ class SupportMonitorBot(discord.Client):
             subtitle=subtitle,
         )
 
-        # Create issue if tracking is enabled
-        await self._create_issue(message, result)
-
-    async def _create_issue(
+    async def _maybe_create_issue(
         self,
         message: discord.Message,
         result: ClassificationResult,
     ) -> None:
-        """Create an issue for a message that requires attention."""
+        """Create an issue if the category is configured for issue tracking."""
         if self.issue_tracker.tracker_type == IssueTrackerType.NONE:
+            return
+
+        # Check if this category should create issues
+        # Empty list = create issues for all messages that require attention (falsy, skips filter)
+        issue_categories = self.settings.issue_categories
+        if issue_categories and result.category.value not in issue_categories:
+            logger.debug(
+                "Skipping issue creation for category %s (not in %s)",
+                result.category.value,
+                issue_categories,
+            )
             return
 
         channel_name = getattr(message.channel, "name", "unknown")
