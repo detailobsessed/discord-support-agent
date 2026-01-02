@@ -38,7 +38,7 @@ cp .env.example .env
 # Edit .env and add your DISCORD_TOKEN
 
 # Run
-uv run python main.py
+uv run main.py
 ```
 
 ## Configuration

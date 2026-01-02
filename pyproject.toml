@@ -30,6 +30,7 @@ dependencies = [
     "pydantic-ai>=1.39.0",
     "pydantic-evals>=0.3",
     "pygithub>=2.8.1",
+    "rich>=14.2.0",
 ]
 
 [project.urls]
