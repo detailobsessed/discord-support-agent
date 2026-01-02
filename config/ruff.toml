@@ -62,11 +62,15 @@ ignore = [
     "INP001",  # File is part of an implicit namespace package
     "T201",  # Print statement
 ]
+"setup.py" = [
+    "T201",  # Print statement (CLI script)
+]
 "tests/**.py" = [
     "ARG005",  # Unused lambda argument
     "FBT001",  # Boolean positional arg in function definition
     "PLR2004",  # Magic value used in comparison
     "S101",  # Use of assert detected
+    "S106",  # Possible hardcoded password (test fixtures)
 ]
 
 [lint.flake8-quotes]

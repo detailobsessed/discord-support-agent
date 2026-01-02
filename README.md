@@ -50,9 +50,43 @@ Environment variables (set in `.env`):
 | `OLLAMA_MODEL`           | No       | `qwen3:30b`                 | Model for classification                 |
 | `ISSUE_TRACKER`          | No       | `none`                      | Issue tracker: `none`, `github`, `linear`|
 | `GITHUB_TOKEN`           | No       | -                           | GitHub PAT for issue creation            |
-| `GITHUB_REPO`            | No       | -                           | GitHub repo in `owner/repo` format       |
+| `GITHUB_REPO`            | No       | -                           | GitHub repo for issues (see below)       |
 | `OTEL_ENABLED`           | No       | `false`                     | Enable OpenTelemetry instrumentation     |
 | `OTEL_EXPORTER_ENDPOINT` | No       | `http://localhost:4318`     | OTLP exporter endpoint                   |
+
+### GitHub Issue Tracking
+
+The easiest way to set up GitHub issue tracking is with the interactive setup:
+
+```bash
+uv run setup.py
+```
+
+This will:
+
+- Check your `gh` CLI authentication
+- Create a dedicated repository for support issues
+- Update your `.env` file automatically
+
+**Manual setup:**
+
+1. Create a new repo (e.g., `yourorg/discord-support-issues`)
+2. Create a [fine-grained PAT](https://github.com/settings/tokens?type=beta) with `Issues: Read and write` permission for that repo only
+3. Set in `.env`:
+
+   ```
+   ISSUE_TRACKER=github
+   GITHUB_TOKEN=ghp_your_token
+   GITHUB_REPO=yourorg/discord-support-issues
+   ```
+
+**Why a separate repo?**
+
+- **Security** - Bot token only has access to issues, not your source code
+- **Noise reduction** - Support tickets won't clutter your project's issue tracker
+- **Permissions** - Different team members can triage support vs. code issues
+
+The bot will auto-create labels (`support`, `bug`, `complaint`, `needs-response`, `needs-triage`) on first use.
 
 ## How It Works
 
