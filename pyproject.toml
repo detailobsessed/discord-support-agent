@@ -44,7 +44,7 @@ Funding = "https://github.com/sponsors/detailobsessed"
 [dependency-groups]
 maintain = [
     "build>=1.2",
-    "yore>=0.4",
+    "yore>=0.4.7",
     "python-semantic-release>=10",
 ]
 ci = [
